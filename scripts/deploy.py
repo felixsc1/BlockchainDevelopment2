@@ -1,16 +1,16 @@
-from brownie import accounts, config
+from brownie import accounts, config, SimpleStorage
 # import os #not needed when using config
 
 
 def deploy_simple_storage():
-    # below different variants how to manage keys:
-    # account = accounts[0]  # from local ganache
-    # account = accounts.load("rinkebytest") #from brownie account manager
-    # from environment variable (needs brownie-config.yaml)
-    # account = accounts.add(os.getenv("PRIVATE_KEY"))
-    account = accounts.add(config['wallets']['from_key'])
-    print(account)
-
+    account = accounts[0]
+    simple_storage = SimpleStorage.deploy({"from": account})
+    stored_value = simple_storage.retrieve() # since its a "view" function, doesnt need "from"
+    print(stored_value)
+    transaction = simple_storage.store(15, {"from": account}) #since its transaction, need from
+    transaction.wait(1) # how many blocks to wait, for transaction to finish
+    updated_store_value = simple_storage.retrieve()
+    print(updated_store_value)
 
 def main():
     deploy_simple_storage()
